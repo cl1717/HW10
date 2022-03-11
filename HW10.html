@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>API Fun</title>
+<meta charset="utf-8">
+
+<script>
+    function loadData() {
+        /* Step 1: Make instance of request object to make HTTP request after page is loaded*/
+        request = new XMLHttpRequest();
+        console.log("1 - request object created");
+
+        // Step 2: Set the URL for the AJAX request to be the JSON file
+        request.open("GET", "https://api.coingecko.com/api/v3/exchange_rates", true);
+        console.log("2 - opened request file");
+
+        // Step 3: set up event handler/callback
+        request.onreadystatechange = function() {
+            console.log("3 - readystatechange event fired.");
+            if (request.readyState == 4 && request.status == 200) {
+                // Step 5: wait for done + success
+                console.log("5 - response received");
+                result = request.responseText;
+                rates = JSON.parse(result);
+                output = "1 bitcoin = " + rates["rates"]["cny"]["unit"] + rates["rates"]["cny"]["value"] + " (" + rates["rates"]["cny"]["name"] + ") <br />";
+                output += "1 bitcoin = " + rates["rates"]["usd"]["unit"] + rates["rates"]["usd"]["value"] + " (" + rates["rates"]["usd"]["name"] + ") <br />";
+                document.getElementById("data").innerHTML = output;  
+            }
+            else if (request.readyState == 4 && request.status != 200) {
+            document.getElementById("data").innerHTML = "Something is wrong!  Check the logs to see where this went off the rails";
+            }
+            else if (request.readyState == 3) {
+                document.getElementById("data").innerHTML = "Too soon!  Try again";
+            }
+        }
+
+    // Step 4: fire off the HTTP request
+        request.send();
+        console.log("4 - Request sent");
+    }
+
+    window.onload=function(){
+        res = fetch("https://api.coingecko.com/api/v3/exchange_rates")
+          .then(res=>res.text())
+          .then(data=>
+          {
+              data = JSON.parse(data);
+              cnyUnit = data.rates.cny.unit;
+              cnyValue = data.rates.cny.value;
+              cnyName = data.rates.cny.name;
+              usdUnit = data.rates.usd.unit;
+              usdValue = data.rates.usd.value;
+              usdName = data.rates.usd.name;
+              message = "1 bitcoin = " + cnyUnit + cnyValue + " (" + cnyName + ") <br />";
+              message += "1 bitcoin = " + usdUnit + usdValue + " (" + usdName + ") <br />";
+              setMessage(message);
+          })
+          .catch(error=>setMessage(error))
+    }
+    function setMessage(msg) {
+        document.getElementById("fetch").innerHTML = msg;
+    }
+</script>
+</head>
+
+<body>
+	<h1>Exchange Rates API</h1>
+    <script>
+        loadData();
+    </script>
+    <h2 style="color:blueviolet"><strong>Display using XMLHttpRequest()</strong></h2> <br>
+    <div id="data">&nbsp</div>
+    <br>
+    <h2 style="color:blueviolet"><strong>Display using fetch()</strong></h2> <br>
+    <div id="fetch">&nbsp</div>
+    <br>
+    <h2 style="color:blueviolet"><strong>Information</strong></h2>
+        <ul>
+            <li>
+                <strong>Description of API:</strong> This API provides the exchange rates between bitcoin and different currencies,
+                i.e. it gives the value of 1 bitcoin in each currency.
+            </li>
+            <li>
+                <strong>Taken from:</strong> https://mixedanalytics.com/blog/list-actually-free-open-no-auth-needed-apis/
+            </li>
+            <li>
+                <strong>Options used for API request:</strong> I used the GET request and specified the "true" parameter
+                to fetch data asynchronously.
+            </li>
+            <li>
+                <strong>Applications of API:</strong> 1) This API could be used by a website that sells bitcoins to let customers know
+                how much bitcoins cost in the selected currency. 2) This API could be used by a stock market website
+                to show viewers changes in the value of bitcoins over time. 
+            </li>
+        </ul>
+</body>
+</html>
